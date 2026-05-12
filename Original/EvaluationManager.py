@@ -11,7 +11,7 @@ class EvaluationManager:
         print("EM: Submitting score")
         self.scores.append(score)
         self.reviewers.append(reviewer)
-        database = Database()
+        database = Database(self)
         database.saveScore(self.title, score, reviewer)
 
     def calculateAverage(self) -> float:
@@ -20,24 +20,23 @@ class EvaluationManager:
     
     def checkConsensus(self) -> bool:
         print("EM: Checking consensus")
-        avg = self.calculateAverage()
-        if avg > 7.5:
+        if max(self.scores) - min(self.scores) <= 5:
             return True
         return False
     
     def applyRules(self) -> str:
         print("EM: Applying Rules")
-        if len(self.scores) == 0:
+        if not self.checkConsensus():
             return "Revision"
-        elif self.checkConsensus():
+        elif self.calculateAverage() >= 7.5:
             return "Accepted"
         else:
             return "Rejected"
     
     def startEvaluation(self):
-        outcome = self.applyRules()
-
+        print("EM: Starting Evaluation")
         print(self.scores)
+        outcome = self.applyRules()
 
         match outcome:
             case "Accepted":
@@ -45,7 +44,8 @@ class EvaluationManager:
                 ns.notifyAcceptance()
             case "Rejected":
                 ns = NotificationService(self.title)
-                ns.notifyAcceptance()
+                ns.notifyRejection()
             case "Revision":
                 ns = NotificationService(self.title)
                 ns.notifyRevision()
+

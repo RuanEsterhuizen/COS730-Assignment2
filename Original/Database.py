@@ -4,8 +4,9 @@ import json
 from Reviewer import Reviewer
 
 class Database:
-    def __init__(self):
+    def __init__(self, evaluationManager):
         self.db_name = "app.db"
+        self.em = evaluationManager
         self._init_db()
     
     def _init_db(self) -> None:
@@ -52,7 +53,17 @@ class Database:
             cursor.execute(
                 """
                 INSERT INTO submissions
-                (title, author, date, research_group, supervisor, abstract, keywords, scores, reviewers)
+                (
+                    title,
+                    author,
+                    date,
+                    research_group,
+                    supervisor,
+                    abstract,
+                    keywords,
+                    scores,
+                    reviewers
+                )
                 VALUES (?,?,?,?,?,?,?,?,?)
                 """,
                 (
@@ -91,12 +102,36 @@ class Database:
         reviewers = []
 
         for row in rows:
-            reviewer = Reviewer(row[1], row[2])
+            reviewer = Reviewer(row[1], row[2], self.em)
             reviewers.append(reviewer)
 
         conn.close()
 
         return reviewers
+
+    def _getSubmissionId(self, cursor, title:str):
+        """
+        Returns the most recently inserted submission
+        matching the title.
+        """
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM submissions
+            WHERE title=?
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (title,)
+        )
+
+        row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return row[0]
 
     def saveScore(self, title:str, score:int, reviewer:str) -> None:
         print("DB: Saving score")
@@ -107,16 +142,18 @@ class Database:
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
 
+            submission_id = self._getSubmissionId(cursor, title)
+
+            if submission_id is None:
+                print("Submission not found")
+                return
+
             cursor.execute(
-                "SELECT * FROM submissions WHERE title=?",
-                (title,)
+                "SELECT * FROM submissions WHERE id=?",
+                (submission_id,)
             )
 
             row = cursor.fetchone()
-
-            if row is None:
-                print("Submission not found")
-                return
 
             scores = json.loads(row[8]) if row[8] else []
             reviewers = json.loads(row[9]) if row[9] else []
@@ -128,8 +165,16 @@ class Database:
             new_reviewers = json.dumps(reviewers)
 
             cursor.execute(
-                "UPDATE submissions SET scores=?, reviewers=? WHERE title=?",
-                (new_scores, new_reviewers, title)
+                """
+                UPDATE submissions
+                SET scores=?, reviewers=?
+                WHERE id=?
+                """,
+                (
+                    new_scores,
+                    new_reviewers,
+                    submission_id
+                )
             )
 
             conn.commit()

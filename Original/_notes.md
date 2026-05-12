@@ -10,6 +10,6 @@
 ## Validation Rules
 1. JSON must be valid format
 2. All fields must be present
-think of more
+3. Research group must be one of those in the CS department
 
 ## Problems with current design
