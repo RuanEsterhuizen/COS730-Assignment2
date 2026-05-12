@@ -14,8 +14,6 @@ Student: Ruan Esterhuizen (u23532387)
 │   ├── // All project classes
 │   └── main.py
 ├── README.md
-├── Report_Metrics.py
-├── requirements.txt
 └── u23532387_Report_COS730_A2.pdf
 ```
 
