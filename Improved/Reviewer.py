@@ -1,13 +1,10 @@
 import random
 
 class Reviewer:
-    def __init__(self, name: str, group: str, evaluationManager):
+    def __init__(self, name: str, group: str):
         self.name = name
         self.group = group
-        self.em = evaluationManager
 
-    def assignReview(self, title:str) -> None:
+    def assignReview(self, title:str) -> int:
         print(f"R: Assigning Review ({self.name} - {title})")
-
-    def getScore(self) -> int:
         return random.randint(0,10)
