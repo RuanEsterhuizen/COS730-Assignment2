@@ -64,7 +64,6 @@ class Database:
                     supervisor,
                     abstract,
                     keywords,
-                    scores,
                     reviewers
                 )
                 VALUES (?,?,?,?,?,?,?,?,?)
@@ -77,7 +76,6 @@ class Database:
                     data["supervisor"],
                     data["abstract"],
                     data["keyword"],
-                    json.dumps([]),
                     json.dumps([])
                 )
             )
@@ -114,33 +112,8 @@ class Database:
             if conn:
                 conn.close()
 
-    def _getSubmissionId(self, cursor, title:str):
-        """
-        Returns the most recently inserted submission
-        matching the title.
-        """
-
-        cursor.execute(
-            """
-            SELECT id
-            FROM submissions
-            WHERE title=?
-            ORDER BY id DESC
-            LIMIT 1
-            """,
-            (title,)
-        )
-
-        row = cursor.fetchone()
-
-        if row is None:
-            return None
-
-        return row[0]
-
-    def saveScore(self, title:str, score:int, reviewer:str) -> None:
-        # TODO: this should get an array of scores and reviewer names
-        print("DB: Saving score")
+    def saveScores(self, submissionId:int, scores:list[int]) -> None:
+        print("DB: Saving scores")
 
         conn = None
 
@@ -148,38 +121,15 @@ class Database:
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
 
-            submission_id = self._getSubmissionId(cursor, title)
-
-            if submission_id is None:
-                print("Submission not found")
-                return
-
-            cursor.execute(
-                "SELECT * FROM submissions WHERE id=?",
-                (submission_id,)
-            )
-
-            row = cursor.fetchone()
-
-            scores = json.loads(row[8]) if row[8] else []
-            reviewers = json.loads(row[9]) if row[9] else []
-
-            scores.append(score)
-            reviewers.append(reviewer)
-
-            new_scores = json.dumps(scores)
-            new_reviewers = json.dumps(reviewers)
-
             cursor.execute(
                 """
                 UPDATE submissions
-                SET scores=?, reviewers=?
+                SET scores=?
                 WHERE id=?
                 """,
                 (
-                    new_scores,
-                    new_reviewers,
-                    submission_id
+                    json.dumps(scores),
+                    submissionId
                 )
             )
 

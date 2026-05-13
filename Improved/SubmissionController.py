@@ -13,7 +13,7 @@ class SubmissionController:
         em = EvaluationManager()
         ns = NotificationService()
 
-        data_json, submission_id = sm.saveSubmission(data) # throws exceptions for invalid format and db fail
-        rm.assignReviewers(data_json["group"]) # throws exception if there are no reviewers
-        outcome = em.startEvaluation(submission_id)
+        data_json, submissionId = sm.saveSubmission(data) # throws exceptions for invalid format and db fail
+        rm.assignReviewers(data_json["group"], submissionId) # throws exception if there are no reviewers
+        outcome = em.startEvaluation(submissionId)
         ns.sendNotification(data_json["title"], outcome)

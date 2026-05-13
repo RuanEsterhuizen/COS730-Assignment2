@@ -17,10 +17,8 @@ class ReviewerManager:
         print("RM: Checking Workload")
         # reduced for simplicity, remove one reviewer if there is more than one in the list
         return reviewerList[1:] if len(reviewerList) > 1 else reviewerList
-
-    def assignReviewers(self, submissionGroup) -> None:
-        print("RM: Assigning Reviewers")
-
+    
+    def fetchReviewers() -> list[Reviewer]:
         # fetch reviewers from the database
         db = Database()
         reviewerListRaw = db.fetchReviewers()
@@ -29,6 +27,13 @@ class ReviewerManager:
         for r in reviewerListRaw:
             reviewer = Reviewer(r["name"], r["research_group"])
             reviewerList.append(reviewer)
+
+        return reviewerList
+
+    def assignReviewers(self, submissionGroup, submissionId) -> None:
+        print("RM: Assigning Reviewers")
+
+        reviewerList = self.fetchReviewers()
 
         # filter the reviewers
         filteredList = self.filterConflicts(reviewerList, submissionGroup)
@@ -39,5 +44,11 @@ class ReviewerManager:
             raise Exception("There are no reviewers available at this time")
 
         # assign reviewers
+        scores = []
         for r in filteredList:
-            r.assignReview()
+            score = r.assignReview()
+            scores.append(score)
+
+        # save all scores to the database
+        db = Database()
+        db.saveScores(submissionId, scores)
