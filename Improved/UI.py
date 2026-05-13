@@ -27,8 +27,6 @@ class UI:
         self.window.mainloop()
 
     def submit_data(self):
-        from SubmissionController import SubmissionController
-
         path = "data/" + self.data_entry.get() + ".json"
         try:
             file = open(path, "r")

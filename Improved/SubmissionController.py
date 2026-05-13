@@ -1,26 +1,19 @@
-import json
+from SubmissionManager import SubmissionManager
+from ReviewerManager import ReviewerManager
+from EvaluationManager import EvaluationManager
+from NotificationService import NotificationService
 
 class SubmissionController:
-    def __init__(self, evaluationManager, reviewerManager, notificationService, submissionManager, validator):
-        self.em = evaluationManager
-        self.rm = reviewerManager
-        self.ns = notificationService
-        self.sm = submissionManager
-        self.v = validator
-
     def submit(self, data):
 
         print("SC: Submitting research output")
-        valid, msg = self.v.validateFormat(data)
+        
+        sm = SubmissionManager()
+        rm = ReviewerManager()
+        em = EvaluationManager()
+        ns = NotificationService()
 
-        if valid[0]:
-            data_json = json.loads(data)
-
-            self.sm.saveSubmission(data_json)
-            scores = self.rm.assignReviewers(data_json["group"])
-            outcome = self.em.EvaluationManager(scores)
-            self.ns.sendNotification(data_json["title"], outcome)
-            
-        else:
-            print("SC: Invalid Data Format")
-            raise Exception(f"SC: Invalid Data Format ({msg})")
+        data_json = sm.saveSubmission(data) # throws exceptions for invalid format and db fail
+        scores = rm.assignReviewers(data_json["group"]) # throws exception if there are no reviewers
+        outcome = em.EvaluationManager(scores)
+        ns.sendNotification(data_json["title"], outcome)

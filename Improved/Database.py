@@ -3,6 +3,8 @@ import json
 
 from Reviewer import Reviewer
 
+# TODO: make this a singleton
+
 class Database:
     def __init__(self, evaluationManager):
         self.db_name = "app.db"
