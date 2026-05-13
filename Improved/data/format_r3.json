@@ -3,7 +3,7 @@
     "date" : "05/05/2026",
     "title" : "Automating the REPA protocol",
     "group" : "CERU",
-    "supervisor" : "Prof. Piet Pompies",
+    "supervisor" : "Prof. John Doe",
     "abstract" : "We present an automation framework for the REPA protocol, used by the UP Department of Zoology. This method employs semi-supervised object detection.",
     "keyword" : "Elephant Conservation, Computer Vision, Pseudo Labels"
 }
