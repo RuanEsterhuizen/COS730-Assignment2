@@ -141,3 +141,23 @@ class Database:
         finally:
             if conn:
                 conn.close()
+
+    def fetchScores(self, submissionId:int) -> list[int]:
+        print("DB: Fetching Scores")
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT scores FROM submissions WHERE id=?", (submissionId))
+
+            row = cursor.fetchone()
+            scores = json.loads(row[0])
+
+            return [int(score) for score in scores]
+
+        except Exception as e:
+            print("DB Error:", e)
+
+        finally:
+            if conn:
+                conn.close()
