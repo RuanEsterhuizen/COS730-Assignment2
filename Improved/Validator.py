@@ -28,6 +28,6 @@ class Validator:
             
         # Rule 3 - Research group must be valid
         if output["group"] not in allowed_groups:
-            return False, "Invalid Attribute: 'group'", None
+            return False, "Research group not found", None
         
         return True, "Valid Format", output

@@ -3,6 +3,7 @@ from Database import Database
 
 class SubmissionManager:
     def saveSubmission(self, data:str) -> tuple[dict,int]:
+        print("SM: Saving Submission")
         # validate format
         v = Validator()
         valid, msg, data_json = v.validateFormat(data)
