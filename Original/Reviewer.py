@@ -7,8 +7,7 @@ class Reviewer:
         self.em = evaluationManager
 
     def assignReview(self, title:str) -> None:
-        print(f"Reviewer: Assigning Review ({self.name} - {title}))")
+        print(f"R: Assigning Review ({self.name} - {title})")
 
-        # randomly score the work
-        score = random.randint(0,10)
-        self.em.submitScore(score, self.name)
+    def getScore(self) -> int:
+        return random.randint(0,10)

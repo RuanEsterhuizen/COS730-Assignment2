@@ -27,7 +27,7 @@ class SubmissionController():
             for reviewer in filteredReviewers:
                 reviewer.assignReview(data_json["title"])
 
-            eval_man.startEvaluation()
+            eval_man.startEvaluation(filteredReviewers)
         else:
             print("SC: Invalid Data Format")
             raise Exception("SC: Invalid Data Format")
