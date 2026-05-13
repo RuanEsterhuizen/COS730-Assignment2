@@ -5,6 +5,6 @@ class Reviewer:
         self.name = name
         self.group = group
 
-    def assignReview(self, title:str) -> int:
-        print(f"R: Assigning Review ({self.name} - {title})")
+    def assignReview(self) -> int:
+        print(f"R: Assigning Review ({self.name})")
         return random.randint(0,10)

@@ -15,9 +15,14 @@ class EvaluationManager:
         database.saveScore(self.title, score, reviewer)
 
     def calculateAverage(self) -> float:
+        if not self.scores:
+            return 0
         return sum(self.scores) / len(self.scores)
     
     def checkConsensus(self) -> bool:
+        if not self.scores:
+            return False
+
         if max(self.scores) - min(self.scores) <= 5:
             return True
         return False

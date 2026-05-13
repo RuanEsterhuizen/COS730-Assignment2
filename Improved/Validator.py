@@ -5,7 +5,7 @@ class Validator:
         print("V: Validating format")
 
         required_fields = ["title", "author", "date", "group", "supervisor", "abstract", "keyword"]
-        allowed_groups = ["CIRG", "SSFM", "CSEDAR", "DSfSI", "NICOG", "DigiForS"]
+        allowed_groups = ["CIRG", "SSFM", "CSEDAR", "DSFSI", "NICOG", "DIGIFORS"]
 
         # Rule 1 - Must be valid JSON format
         try:

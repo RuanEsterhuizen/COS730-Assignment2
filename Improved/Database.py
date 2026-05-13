@@ -36,8 +36,7 @@ class Database:
             supervisor TEXT,
             abstract TEXT,
             keywords TEXT,
-            scores TEXT,
-            reviewers TEXT
+            scores TEXT
         )
         """)
 
@@ -64,9 +63,9 @@ class Database:
                     supervisor,
                     abstract,
                     keywords,
-                    reviewers
+                    scores
                 )
-                VALUES (?,?,?,?,?,?,?,?,?)
+                VALUES (?,?,?,?,?,?,?,?)
                 """,
                 (
                     data["title"],
@@ -148,7 +147,7 @@ class Database:
             conn = sqlite3.connect(self.db_name)
             cursor = conn.cursor()
 
-            cursor.execute("SELECT scores FROM submissions WHERE id=?", (submissionId))
+            cursor.execute("SELECT scores FROM submissions WHERE id=?", (submissionId,))
 
             row = cursor.fetchone()
             scores = json.loads(row[0])

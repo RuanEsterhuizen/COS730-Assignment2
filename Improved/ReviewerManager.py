@@ -18,7 +18,7 @@ class ReviewerManager:
         # reduced for simplicity, remove one reviewer if there is more than one in the list
         return reviewerList[1:] if len(reviewerList) > 1 else reviewerList
     
-    def fetchReviewers() -> list[Reviewer]:
+    def fetchReviewers(self) -> list[Reviewer]:
         # fetch reviewers from the database
         db = Database()
         reviewerListRaw = db.fetchReviewers()
