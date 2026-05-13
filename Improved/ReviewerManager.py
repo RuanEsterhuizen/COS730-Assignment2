@@ -1,19 +1,15 @@
 from Reviewer import Reviewer
-
+from Database import Database
 
 class ReviewerManager:
-    def __init__(self, evaluationManager, group:str):
-        self.em = evaluationManager
-        self.group = group
-
-    def filterConflicts(self, reviewerList: list[Reviewer]) -> list[Reviewer]:
+    def filterConflicts(self, reviewerList: list[Reviewer], submissionGroup) -> list[Reviewer]:
         print("RM: Reviewing conflicts")
         # Reviewers can only review outputs from their relevant research groups
 
         filteredList = [
             reviewer
             for reviewer in reviewerList
-            if reviewer.group == self.group
+            if reviewer.group == submissionGroup
         ]
         return filteredList
 
@@ -22,5 +18,26 @@ class ReviewerManager:
         # reduced for simplicity, remove one reviewer if there is more than one in the list
         return reviewerList[1:] if len(reviewerList) > 1 else reviewerList
 
-    def getAvailableReviewers(self) -> list[Reviewer]:
-        #TODO: this one changed
+    def assignReviewers(self, submissionGroup) -> None:
+        print("RM: Assigning Reviewers")
+
+        # fetch reviewers from the database
+        db = Database()
+        reviewerListRaw = db.fetchReviewers()
+
+        reviewerList = []
+        for r in reviewerListRaw:
+            reviewer = Reviewer(r["name"], r["research_group"])
+            reviewerList.append(reviewer)
+
+        # filter the reviewers
+        filteredList = self.filterConflicts(reviewerList, submissionGroup)
+        filteredList = self.checkWorkload(filteredList)
+
+        # check if reviewers are available, else return error
+        if not filteredList:
+            raise Exception("There are no reviewers available at this time")
+
+        # assign reviewers
+        for r in filteredList:
+            r.assignReview()

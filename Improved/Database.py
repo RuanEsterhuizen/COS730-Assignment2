@@ -1,15 +1,16 @@
 import sqlite3
 import json
 
-from Reviewer import Reviewer
-
-# TODO: make this a singleton
-
 class Database:
-    def __init__(self, evaluationManager):
-        self.db_name = "app.db"
-        self.em = evaluationManager
-        self._init_db()
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.db_name = "app.db"
+            cls._instance._init_db()
+        return cls._instance
+
     
     def _init_db(self) -> None:
         conn = sqlite3.connect(self.db_name)
@@ -43,7 +44,7 @@ class Database:
         conn.commit()
         conn.close()
 
-    def saveSubmission(self, data) -> bool:
+    def saveSubmission(self, data) -> tuple[bool,int]:
         print("DB: Saving submission")
 
         conn = None
@@ -82,26 +83,36 @@ class Database:
             )
 
             conn.commit()
-            return True
-
+            return True, cursor.lastrowid
+        
         except Exception as e:
             print("DB Error:", e)
             return False
-
+        
         finally:
             if conn:
                 conn.close()
 
-    def fetchReviewers(self) -> list[Reviewer]:
+    def fetchReviewers(self) -> list:
         print("DB: Fetching reviewers")
 
-        conn = sqlite3.connect(self.db_name)
-        cursor = conn.cursor()
+        try:
+            conn = sqlite3.connect(self.db_name)
+            cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM reviewers")
-        rows = cursor.fetchall()
+            cursor.execute("SELECT * FROM reviewers")
+            columns = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
 
-        return rows
+            return [dict(zip(columns, row)) for row in rows]
+        
+        except Exception as e:
+            print("DB Error:", e)
+            return []
+        
+        finally:
+            if conn:
+                conn.close()
 
     def _getSubmissionId(self, cursor, title:str):
         """
