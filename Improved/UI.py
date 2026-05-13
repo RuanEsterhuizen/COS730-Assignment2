@@ -2,7 +2,9 @@ import time
 import tkinter as tk
 
 class UI:
-    def __init__(self):
+    def __init__(self, submissionController):
+        self.sc = submissionController
+
         self.window = tk.Tk()
         self.window.geometry("600x400")
         self.window.title("COS730 - Assignment 2")
@@ -38,8 +40,7 @@ class UI:
             print("UI: Submitting Data to SubmissionController")
 
             start = time.time()
-            sc = SubmissionController()
-            sc.submit(data)
+            self.sc.submit(data)
             runtime = time.time() - start
 
             print(f"Runtime: {runtime:.4}s")

@@ -1,10 +1,6 @@
 import time
 
 class NotificationService:
-    def __init__(self, title:str, outcome:str):
-        self.title = title
-        self.outcome = outcome
-    
-    def sendNotification(self):
+    def sendNotification(self, title:str, outcome:str):
         time.sleep(0.01)
-        print(f"NS: Notifying {self.outcome} ({self.title})")
+        print(f"NS: Notifying {outcome} ({title})")

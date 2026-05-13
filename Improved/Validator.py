@@ -1,7 +1,7 @@
 import json
 
 class Validator:
-    def validateFormat(self, data) -> bool:
+    def validateFormat(self, data) -> tuple[bool, str]:
         print("V: Validating format")
 
         required_fields = ["title", "author", "date", "group", "supervisor", "abstract", "keyword"]
@@ -11,23 +11,23 @@ class Validator:
         try:
             output = json.loads(data)
         except json.JSONDecodeError:
-            return False
+            return False, "Invalid JSON"
         
         if not isinstance(output, dict):
-            return False
+            return False, "Invalid JSON"
         
         # Rule 2 - All fields must be present and have non-empty values
         for field in required_fields:
             if field not in output:
-                return False
+                return False, "Missing Attributes"
             
             value = output[field]
 
             if value is None or str(value).strip == "":
-                return False
+                return False, "Missing Attributes"
             
         # Rule 3 - Research group must be valid
         if output["group"] not in allowed_groups:
-            return False
+            return False, "Invalid Attribute: 'group'"
         
-        return True
+        return True, "Valid Format"

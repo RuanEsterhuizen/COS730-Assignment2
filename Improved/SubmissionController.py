@@ -1,33 +1,26 @@
 import json
 
-class SubmissionController():
-    def submit(self, data):
-        from EvaluationManager import EvaluationManager
-        from Validator import Validator
-        from Database import Database
-        from ReviewerManager import ReviewerManager
+class SubmissionController:
+    def __init__(self, evaluationManager, reviewerManager, notificationService, submissionManager, validator):
+        self.em = evaluationManager
+        self.rm = reviewerManager
+        self.ns = notificationService
+        self.sm = submissionManager
+        self.v = validator
 
+    def submit(self, data):
 
         print("SC: Submitting research output")
-        v = Validator()
-        valid = v.validateFormat(data)
+        valid, msg = self.v.validateFormat(data)
 
-        if valid:
+        if valid[0]:
             data_json = json.loads(data)
-            eval_man = EvaluationManager(data_json["title"])
-            db = Database(eval_man)
-            confirmation = db.saveSubmission(data_json)
 
-            if not confirmation:
-                raise Exception("SC: Save Submission to database failed")
-
-            reviewer_man = ReviewerManager(eval_man, data_json["group"])
-            filteredReviewers = reviewer_man.getAvailableReviewers()
-
-            for reviewer in filteredReviewers:
-                reviewer.assignReview(data_json["title"])
-
-            eval_man.startEvaluation(filteredReviewers)
+            self.sm.saveSubmission(data_json)
+            scores = self.rm.assignReviewers(data_json["group"])
+            outcome = self.em.EvaluationManager(scores)
+            self.ns.sendNotification(data_json["title"], outcome)
+            
         else:
             print("SC: Invalid Data Format")
-            raise Exception("SC: Invalid Data Format")
+            raise Exception(f"SC: Invalid Data Format ({msg})")
