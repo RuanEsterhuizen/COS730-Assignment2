@@ -31,5 +31,5 @@ class EvaluationManager:
         print("EM: Starting Evaluation")
         scores = self.fetchScores(submissionId)
         outcome = self.determineOutcome(scores)
-        print(f"Scores (only for debugging): {scores}")
+        print(f"Scores: {scores}")
         return outcome
